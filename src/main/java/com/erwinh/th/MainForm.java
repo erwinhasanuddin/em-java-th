@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Scanner;
+import java.util.Random;
 
 class Position
 {
@@ -28,17 +29,12 @@ public class MainForm extends javax.swing.JFrame {
     String Obstacle = "#";
     String ValidPath = ".";
     String TreasureSymbol = "$";
+    String BoardContents = "";
     String PrevContent = ValidPath;
     String NextContent = "";
     
     Position InitialPos;
     Position CurrentPos;
-    
-    /*
-     user position Left = Column; Top = Row
-    static int InitialUserPosCol = 1;
-    static int InitialUserPosRow = 4;
-    */
 
     // array length
     int ColLen = 8;
@@ -50,6 +46,9 @@ public class MainForm extends javax.swing.JFrame {
     //static ConsoleKeyInfo inputKey;
     String NewLine = "\n";
     int Decreaser = 9;
+
+    int TreasurePosCount = 3;
+    Position TreasurePos;
     
     /**
      * Creates new form MainForm
@@ -58,8 +57,8 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
                 
         InitValue();
-//        InitBoardContent();
         BuildLayout();
+        SetTreasurePos();
     }
 
     /**
@@ -75,6 +74,7 @@ public class MainForm extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -98,12 +98,23 @@ public class MainForm extends javax.swing.JFrame {
         jTextArea2.setRows(5);
         jScrollPane2.setViewportView(jTextArea2);
 
+        jButton1.setText("Reset");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(93, 93, 93)
+                        .addComponent(jButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -112,7 +123,9 @@ public class MainForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addGap(0, 11, Short.MAX_VALUE))
             .addComponent(jScrollPane2)
         );
 
@@ -165,6 +178,13 @@ public class MainForm extends javax.swing.JFrame {
         jTextArea2.append("["+GetSelectedText()+";S"+CurrentPos.Start+";E"+CurrentPos.End+"], ");
         //JOptionPane.showMessageDialog(null, "KeyCode: " + code + ", strCode: " + strCode);
     }//GEN-LAST:event_jTextArea1KeyReleased
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        InitValue();
+        BuildLayout();
+        SetTreasurePos();
+        jTextArea1.requestFocus();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -223,14 +243,35 @@ public class MainForm extends javax.swing.JFrame {
     
     private void BuildLayout()
     {
-        println("########");
-        println("#......#");
-        println("#.###..#");
-        println("#...#.##");
-        println("#X#....#");
-        println("########");
+        SetText("");
+        // the board content
+        var strBoardContent = "########" + NewLine +
+            "#......#" + NewLine +
+            "#.###..#" + NewLine +
+            "#...#.##" + NewLine +
+            "#.#....#" + NewLine +
+            "########" + NewLine;
         
-        SelectText(InitialPos);
+        // process the board content line by line
+        Scanner scanner = new Scanner(strBoardContent);
+        while (scanner.hasNextLine())
+        {
+            var line = scanner.nextLine();
+            println(line);
+        }
+        scanner.close();
+        
+//        println("########");
+//        println("#......#");
+//        println("#.###..#");
+//        println("#...#.##");
+//        println("#X#....#");
+//        println("########");
+
+        ReplaceText(InitialPos, UserChar);
+        
+        // store the board content
+        BoardContents = GetAllText();
     }
     
     private void SelectText(Position pos)
@@ -285,7 +326,77 @@ public class MainForm extends javax.swing.JFrame {
             SelectText(CurrentPos);
         }
     }
+    
+    private void SetTreasurePos()
+    {
+        jTextArea2.setText("");
+        // init vars
+        Random random = new Random();
+        Position[] treasurePositions = new Position[TreasurePosCount];
+        // get valid positions
+        int validPos = 0;
+        int minPos = 0;
+        int maxPos = 53;
+        while (validPos <= TreasurePosCount - 1)
+        {
+            // get random number
+            int start = randInt(minPos, maxPos);
+            int end = start + 1;
+            // assign position value
+            var pos = new Position();
+            pos.Start = start;
+            pos.End = end;
+            // get string from position given
+            var strInputPos = BoardContents.substring(pos.Start, pos.End);
+            // position is valid if the string in that position not equal to Obstacle, user char and new line character
+            var isValidPos = !strInputPos.equals(Obstacle) && !strInputPos.equals(UserChar) && !strInputPos.equals(NewLine);
+            
+            // if the position valid mark it with TreasureSymbol and store the position into array
+            if (isValidPos)
+            {
+                // check if treasure position already stored in the array
+                var isExists = IsTreasurePosExists(treasurePositions, pos);
+                if (!isExists){
+                    ReplaceText(pos, TreasureSymbol);
+                    treasurePositions[validPos] = pos;
 
+                    validPos++;
+                    jTextArea2.append("th["+pos.Start+", "+pos.End+"]\n");
+                }
+            }
+        }
+
+        // get random number to select treasure position
+        int treasurePos = randInt(0, TreasurePosCount - 1);
+        // set treasure position
+        TreasurePos = treasurePositions[treasurePos];
+        // select char in the initial position
+        SelectText(InitialPos);
+    }
+    
+    private Boolean IsTreasurePosExists(Position[] positions, Position position)
+    {
+        var result = false;
+        for (Position pos : positions)
+        {
+            if(pos != null && pos.Start == position.Start && pos.End == position.End)
+            {
+                result = true;
+                break;
+            }
+        }
+        
+        return result;
+    }
+    private int randInt(int min, int max) 
+    {
+        Random rand = new Random();
+        int randomNum = rand.nextInt((max - min) + 1) + min;
+
+        return randomNum;
+    }
+    
+/*
     private void InitValue1()
     {
         //initial cursor position
@@ -348,8 +459,9 @@ public class MainForm extends javax.swing.JFrame {
 
         //Console.SetCursorPosition(InitialPos.Column, InitialPos.Row);
     }
-
+*/
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
