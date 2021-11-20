@@ -26,9 +26,9 @@ public class MainForm extends javax.swing.JFrame {
     // user char
     String UserChar = "X";    
     String Obstacle = "#";
-    String ClearPath = ".";
+    String ValidPath = ".";
     String TreasureSymbol = "$";
-    String PrevContent = ClearPath;
+    String PrevContent = ValidPath;
     String NextContent = "";
     
     Position InitialPos;
@@ -79,7 +79,7 @@ public class MainForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Courier New", 0, 18)); // NOI18N
+        jTextArea1.setFont(new java.awt.Font("Courier New", 0, 24)); // NOI18N
         jTextArea1.setRows(5);
         jTextArea1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         jTextArea1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -104,7 +104,7 @@ public class MainForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -249,15 +249,36 @@ public class MainForm extends javax.swing.JFrame {
         return str.substring(pos.Start, pos.End);
     }
     
-    private void ValidateNextMove(Position pos)
+    private String GetAllText()
     {
-        NextContent = Substring(pos);
+        return jTextArea1.getText();
+    }
+    
+    private void SetText(String text)
+    {
+        jTextArea1.setText(text);
+    }
+    
+    private void ReplaceText(Position pos, String newText)
+    {
+        StringBuilder strBuilder = new StringBuilder(GetAllText());
+        strBuilder.replace(pos.Start, pos.End, newText);
+        SetText(strBuilder.toString());
+    }
+    
+    private void ValidateNextMove(Position nextPos)
+    {
+        NextContent = Substring(nextPos);
         var isObstacle = NextContent.equals(Obstacle);
 
         if (!isObstacle)
         {
-            SelectText(pos);
-            CurrentPos = pos;
+            ReplaceText(CurrentPos, PrevContent);
+            // set prev with next content
+            PrevContent = NextContent;
+            ReplaceText(nextPos, UserChar);
+            SelectText(nextPos);
+            CurrentPos = nextPos;
         }
         else
         {
