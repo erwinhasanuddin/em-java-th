@@ -4,17 +4,12 @@
  */
 package com.erwinh.th;
 
-import javax.swing.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Scanner;
 import java.util.Random;
 
 class Position
 {
-    // position Left = Column; Top = Row
-    public int Column;
-    public int Row;
     public int Start;
     public int End;
 }
@@ -37,15 +32,7 @@ public class MainForm extends javax.swing.JFrame {
     
     Position InitialPos;
     Position CurrentPos;
-
-    // array length
-    int ColLen = 8;
-    int RowLen = 6;
-
-    //array 7x9 to hold board content
-    String[][] aBoardContent;
-
-    //static ConsoleKeyInfo inputKey;
+    
     String NewLine = "\n";
     int Decreaser = 9;
 
@@ -183,7 +170,6 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         jTextArea2.append("["+GetSelectedText()+";S"+CurrentPos.Start+";E"+CurrentPos.End+"], ");
-        //JOptionPane.showMessageDialog(null, "KeyCode: " + code + ", strCode: " + strCode);
     }//GEN-LAST:event_jTextArea1KeyReleased
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -245,7 +231,8 @@ public class MainForm extends javax.swing.JFrame {
         InitialPos.Start = 37;
         InitialPos.End = InitialPos.Start + 1;
         CurrentPos = InitialPos;
-        //jTextArea1.setText("test from code");
+        PrevContent = ValidPath;
+        NextContent = "";
     }
     
     private void BuildLayout()
@@ -260,7 +247,8 @@ public class MainForm extends javax.swing.JFrame {
             "########" + NewLine;
         
         // process the board content line by line
-        Scanner scanner = new Scanner(strBoardContent);
+        Scanner scanner;
+        scanner = new Scanner(strBoardContent);
         while (scanner.hasNextLine())
         {
             var line = scanner.nextLine();
@@ -268,12 +256,7 @@ public class MainForm extends javax.swing.JFrame {
         }
         scanner.close();
         
-//        println("########");
-//        println("#......#");
-//        println("#.###..#");
-//        println("#...#.##");
-//        println("#X#....#");
-//        println("########");
+        // Treasure Hunt Hints
         println("");
         println("");
         println("Treasure Hunt Hints:");
@@ -285,7 +268,7 @@ public class MainForm extends javax.swing.JFrame {
         println("- '$' symbol is possible treasure position.");
         println("- 'V' symbol is the treasure (valid treasure position).");
         println("- 'I' symbol is invalid treasure position.");
-        
+        // replace initial position with user char
         ReplaceText(InitialPos, UserChar);
         
         // store the board content
@@ -354,6 +337,7 @@ public class MainForm extends javax.swing.JFrame {
                 
                 // select next position
                 SelectText(nextPos);
+                // set current position with the next position
                 CurrentPos = nextPos;
             }
             else
@@ -366,6 +350,7 @@ public class MainForm extends javax.swing.JFrame {
                 ReplaceText(nextPos, UserChar);
                 // select next position/user character
                 SelectText(nextPos);
+                // set current position with the next position
                 CurrentPos = nextPos;
             }
         }
@@ -404,6 +389,7 @@ public class MainForm extends javax.swing.JFrame {
             {
                 // check if treasure position already stored in the array
                 var isExists = IsTreasurePosExists(treasurePositions, pos);
+                // if not exist store the position detail into the array
                 if (!isExists){
                     ReplaceText(pos, TreasureSymbol);
                     treasurePositions[validPos] = pos;
@@ -424,6 +410,7 @@ public class MainForm extends javax.swing.JFrame {
     
     private Boolean IsTreasurePosExists(Position[] positions, Position position)
     {
+        // check if new treasure position in already in the array
         var result = false;
         for (Position pos : positions)
         {
@@ -445,70 +432,6 @@ public class MainForm extends javax.swing.JFrame {
         return randomNum;
     }
     
-/*
-    private void InitValue1()
-    {
-        //initial cursor position
-        InitialPos = new Position();
-        InitialPos.Column = 1;
-        InitialPos.Row = 4;
-        CurrentPos = InitialPos;
-        //jTextArea1.setText("test from code");
-    }
-    
-    private void InitBoardContent1()
-    {
-        // the board content
-        String strBoardContent = "########" + NewLine +
-                "#......#" + "\n" +
-                "#.###..#" + NewLine +
-                "#...#.##" + NewLine +
-                "#.#....#" + NewLine +
-                "########" + NewLine;
-
-        // init array to hold board content
-        aBoardContent = new String[RowLen][ColLen];
-
-        // init index variables
-        int iRow = 0;
-        int iColumn = 0;
-        int i = 0;
-
-        // process the board content line by line
-        Scanner scanner = new Scanner(strBoardContent);
-        while (scanner.hasNextLine())
-        {
-            //i++;
-            String line = scanner.nextLine();
-            char[] chars = line.toCharArray();
-            for (char c : chars)
-            {
-                aBoardContent[iRow][iColumn] = String.valueOf(c);
-                iColumn++;
-            }
-
-            iRow++;
-            iColumn = 0;
-        }
-        scanner.close();
-
-        aBoardContent[InitialPos.Row][InitialPos.Column] = UserChar;
-    }
-    
-    private void BuildLayout1()
-    {
-        for (int i = 0; i < RowLen; i++)
-        {
-            for (int j = 0; j < ColLen; j++)
-            {
-                print(aBoardContent[i][j]);
-            }
-            println("");
-        }
-
-        //Console.SetCursorPosition(InitialPos.Column, InitialPos.Row);
-    }
-*/
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
