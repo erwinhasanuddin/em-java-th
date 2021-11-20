@@ -100,6 +100,7 @@ public class MainForm extends javax.swing.JFrame {
         jTextArea2.setRows(5);
         jScrollPane2.setViewportView(jTextArea2);
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jButton1.setText("Reset");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,24 +112,21 @@ public class MainForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2)
+            .addComponent(jScrollPane1)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addComponent(jButton1)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(331, 331, 331)
+                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                .addGap(329, 329, 329))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addGap(0, 11, Short.MAX_VALUE))
-            .addComponent(jScrollPane2)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -173,6 +171,13 @@ public class MainForm extends javax.swing.JFrame {
                 nextPos.Start = CurrentPos.Start + 1;
                 nextPos.End = CurrentPos.End + 1;
                 ValidateNextMove(nextPos);               
+                
+                break;
+            case KeyEvent.VK_R :                                        
+                InitValue();
+                BuildLayout();
+                SetTreasurePos();
+                jTextArea1.requestFocus();
                 
                 break;
         }
@@ -269,7 +274,18 @@ public class MainForm extends javax.swing.JFrame {
 //        println("#...#.##");
 //        println("#X#....#");
 //        println("########");
-
+        println("");
+        println("");
+        println("Treasure Hunt Hints:");
+        println("- Use arrow keys (Up, Right, Down, or Left) to move the 'X' symbol and find the treasure.");
+        println("- Press 'R' or 'r' key to reset/reload the board layout.");
+        println("- 'X' symbol is the user char.");
+        println("- '#' symbol is impassable path (obstacle).");
+        println("- '.' symbol is walkable path (valid path).");
+        println("- '$' symbol is possible treasure position.");
+        println("- 'V' symbol is the treasure (valid treasure position).");
+        println("- 'I' symbol is invalid treasure position.");
+        
         ReplaceText(InitialPos, UserChar);
         
         // store the board content
