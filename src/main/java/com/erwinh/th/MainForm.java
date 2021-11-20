@@ -29,6 +29,8 @@ public class MainForm extends javax.swing.JFrame {
     String Obstacle = "#";
     String ValidPath = ".";
     String TreasureSymbol = "$";
+    String TreasureSymbolValid = "V";
+    String TreasureSymbolInvalid = "I";
     String BoardContents = "";
     String PrevContent = ValidPath;
     String NextContent = "";
@@ -314,12 +316,42 @@ public class MainForm extends javax.swing.JFrame {
 
         if (!isObstacle)
         {
-            ReplaceText(CurrentPos, PrevContent);
-            // set prev with next content
-            PrevContent = NextContent;
-            ReplaceText(nextPos, UserChar);
-            SelectText(nextPos);
-            CurrentPos = nextPos;
+            if (NextContent.equals(TreasureSymbol))
+            {
+                // set current user pos with prev content
+                ReplaceText(CurrentPos, PrevContent);
+                
+                if (TreasurePos.Start == nextPos.Start && TreasurePos.End == nextPos.End)
+                {
+                    // set prev with next content
+                    PrevContent = TreasureSymbolValid;
+                    // replace next position with valid treasure symbol
+                    ReplaceText(nextPos, TreasureSymbolValid);
+                }
+                else
+                {
+                    // set prev with next content
+                    PrevContent = TreasureSymbolInvalid;
+                    // replace next position with invalid treasure symbol
+                    ReplaceText(nextPos, TreasureSymbolInvalid);
+                }
+                
+                // select next position
+                SelectText(nextPos);
+                CurrentPos = nextPos;
+            }
+            else
+            {
+                // set current user pos with prev content
+                ReplaceText(CurrentPos, PrevContent);
+                // set prev with next content
+                PrevContent = NextContent;
+                // replace next position with user character
+                ReplaceText(nextPos, UserChar);
+                // select next position/user character
+                SelectText(nextPos);
+                CurrentPos = nextPos;
+            }
         }
         else
         {
@@ -388,6 +420,7 @@ public class MainForm extends javax.swing.JFrame {
         
         return result;
     }
+    
     private int randInt(int min, int max) 
     {
         Random rand = new Random();
