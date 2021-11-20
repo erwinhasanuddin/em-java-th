@@ -24,8 +24,13 @@ class Position
  */
 public class MainForm extends javax.swing.JFrame {
     // user char
-    String UserChar = "X";
-
+    String UserChar = "X";    
+    String Obstacle = "#";
+    String ClearPath = ".";
+    String TreasureSymbol = "$";
+    String PrevContent = ClearPath;
+    String NextContent = "";
+    
     Position InitialPos;
     Position CurrentPos;
     
@@ -120,38 +125,44 @@ public class MainForm extends javax.swing.JFrame {
 
     private void jTextArea1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea1KeyReleased
         String strCode = "";
+        var nextPos = new Position(); 
         int code = evt.getKeyCode();
         switch( code ) {
             case KeyEvent.VK_UP:
                 // handle up
-                if (CurrentPos.End > 1){
-                    strCode = "Key Up";
-                    var nextPos = new Position();                
-                    nextPos.Start = CurrentPos.Start - Decreaser;
-                    nextPos.End = CurrentPos.End - Decreaser;  
-                    SelectText(nextPos);
-                    CurrentPos = nextPos;
-                } 
-                else 
-                {
-                    SelectText(CurrentPos);
-                }
+                strCode = "Key Up";
+                nextPos.Start = CurrentPos.Start - Decreaser;
+                nextPos.End = CurrentPos.End - Decreaser;
+                ValidateNextMove(nextPos);               
+                
                 break;
             case KeyEvent.VK_DOWN:
                 // handle down
                 strCode = "Key Down";
+                nextPos.Start = CurrentPos.Start + Decreaser;
+                nextPos.End = CurrentPos.End + Decreaser;
+                ValidateNextMove(nextPos);               
+                
                 break;
             case KeyEvent.VK_LEFT:
                 // handle left
                 strCode = "Key Left";
+                nextPos.Start = CurrentPos.Start - 1;
+                nextPos.End = CurrentPos.End - 1;
+                ValidateNextMove(nextPos);               
+                
                 break;
             case KeyEvent.VK_RIGHT :
                 // handle right
                 strCode = "Key Right";
+                nextPos.Start = CurrentPos.Start + 1;
+                nextPos.End = CurrentPos.End + 1;
+                ValidateNextMove(nextPos);               
+                
                 break;
         }
         
-        jTextArea2.append(jTextArea1.getSelectedText());
+        jTextArea2.append("["+GetSelectedText()+";S"+CurrentPos.Start+";E"+CurrentPos.End+"], ");
         //JOptionPane.showMessageDialog(null, "KeyCode: " + code + ", strCode: " + strCode);
     }//GEN-LAST:event_jTextArea1KeyReleased
 
@@ -218,13 +229,40 @@ public class MainForm extends javax.swing.JFrame {
         println("#...#.##");
         println("#X#....#");
         println("########");
-        //jTextArea1.setCaretPosition(37);
-        jTextArea1.select(InitialPos.Start, InitialPos.End);
+        
+        SelectText(InitialPos);
     }
     
     private void SelectText(Position pos)
     {
         jTextArea1.select(pos.Start, pos.End);
+    }
+    
+    private String GetSelectedText()
+    {
+        return jTextArea1.getSelectedText();
+    }
+    
+    private String Substring(Position pos)
+    {
+        var str = jTextArea1.getText();
+        return str.substring(pos.Start, pos.End);
+    }
+    
+    private void ValidateNextMove(Position pos)
+    {
+        NextContent = Substring(pos);
+        var isObstacle = NextContent.equals(Obstacle);
+
+        if (!isObstacle)
+        {
+            SelectText(pos);
+            CurrentPos = pos;
+        }
+        else
+        {
+            SelectText(CurrentPos);
+        }
     }
 
     private void InitValue1()
